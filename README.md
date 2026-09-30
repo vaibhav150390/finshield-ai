@@ -35,3 +35,8 @@ ACTION: Turant apna UPI PIN badlo aur bank ko contact karo!
 
 ## Project
 Part of FinShield AI Suite — 5 AI projects built in public.
+
+## Web UI
+Open `index.html` directly in your browser while server is running.
+
+![FinShield AI Screenshot](screenshot.png)
