@@ -1,19 +1,24 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from google import genai
 from dotenv import load_dotenv
 import os
 
-# .env se key load karo
 load_dotenv()
 
-# Naya Gemini client — google.genai package
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
-# Tumhara app
 app = FastAPI()
 
-# Request format
+# Yeh line browser ko allow karti hai API se baat karne ki
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 class TransactionRequest(BaseModel):
     amount: float
     recipient: str

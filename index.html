@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinShield AI 🛡️</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f1623;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: #1a2236;
+      border-radius: 16px;
+      padding: 32px;
+      width: 100%;
+      max-width: 480px;
+      border: 1px solid #2d3748;
+    }
+    h1 { font-size: 24px; color: #00c4b4; margin-bottom: 4px; }
+    p.sub { font-size: 13px; color: #64748b; margin-bottom: 24px; }
+    label { font-size: 12px; color: #94a3b8; display: block; margin-bottom: 4px; }
+    input, select {
+      width: 100%;
+      background: #0f1623;
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: #e2e8f0;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+    button {
+      width: 100%;
+      background: #00c4b4;
+      color: #0f1623;
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+    button:hover { background: #00a896; }
+    .result {
+      margin-top: 24px;
+      background: #0f1623;
+      border-radius: 10px;
+      padding: 16px;
+      border: 1px solid #2d3748;
+      display: none;
+    }
+    .verdict {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+    .suspicious { color: #ef4444; }
+    .safe { color: #10b981; }
+    .detail { font-size: 13px; color: #94a3b8; line-height: 1.8; white-space: pre-wrap; }
+    .loading { text-align: center; color: #64748b; font-size: 13px; margin-top: 16px; display: none; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🛡️ FinShield AI</h1>
+    <p class="sub">Check if your transaction is safe or suspicious</p>
+
+    <label>Amount (₹)</label>
+    <input type="number" id="amount" placeholder="50000" value="50000">
+
+    <label>Recipient</label>
+    <input type="text" id="recipient" placeholder="unknown_9876543210" value="unknown_9876543210">
+
+    <label>Time</label>
+    <input type="text" id="time" placeholder="2:30 AM" value="2:30 AM">
+
+    <label>Payment Method</label>
+    <select id="method">
+      <option>UPI</option>
+      <option>QR Code</option>
+      <option>NEFT</option>
+      <option>IMPS</option>
+      <option>RTGS</option>
+    </select>
+
+    <button onclick="analyze()">🔍 Analyze Transaction</button>
+
+    <div class="loading" id="loading">⏳ Analyzing with AI...</div>
+
+    <div class="result" id="result">
+      <div class="verdict" id="verdict"></div>
+      <div class="detail" id="detail"></div>
+    </div>
+  </div>
+
+  <script>
+    async function analyze() {
+      const amount = document.getElementById('amount').value;
+      const recipient = document.getElementById('recipient').value;
+      const time = document.getElementById('time').value;
+      const method = document.getElementById('method').value;
+
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('result').style.display = 'none';
+
+      try {
+        const response = await fetch('http://127.0.0.1:8000/analyze-transaction', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount, recipient, time, method })
+        });
+
+        const data = await response.json();
+        const text = data.verdict;
+
+        const isSuspicious = text.includes('SUSPICIOUS');
+        document.getElementById('verdict').textContent = isSuspicious ? '🚨 SUSPICIOUS' : '✅ SAFE';
+        document.getElementById('verdict').className = 'verdict ' + (isSuspicious ? 'suspicious' : 'safe');
+        document.getElementById('detail').textContent = text;
+        document.getElementById('result').style.display = 'block';
+
+      } catch(e) {
+        document.getElementById('detail').textContent = 'Error: Make sure server is running on port 8000';
+        document.getElementById('result').style.display = 'block';
+      }
+
+      document.getElementById('loading').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
